@@ -1,0 +1,68 @@
+version: "3.11"
+
+services:
+  postgres:
+    image: postgres:15
+    env_file:
+      - .env.db
+    environment:
+      - TZ=Asia/Tashkent
+    volumes:
+      - ./post_master_pg_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+
+
+  redis:
+    image: redis:latest
+    environment:
+      - TZ=Asia/Tashkent
+    restart: always
+
+
+  web:
+    build: .
+    command: gunicorn post_master.wsgi:application --bind 0.0.0.0:8000 --max-requests 50 --timeout 360 --workers 8 --threads 8
+    volumes:
+      - static_volume:/app/static
+      - .:/app
+      - ./media:/app/media
+    restart: always
+    ports:
+      - "8221:8000"
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Tashkent
+    depends_on:
+      - postgres
+      - redis
+
+
+  celery_worker:
+    build: .
+    command: celery -A post_master worker -l info
+    volumes:
+      - .:/app
+    environment:
+      - TZ=Asia/Tashkent
+    depends_on:
+      - redis
+    restart: always
+
+
+  celery_beat:
+    build: .
+    command: celery -A post_master beat --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - TZ=Asia/Tashkent
+    depends_on:
+      - redis
+    restart: always
+
+
+volumes:
+  static_volume:
