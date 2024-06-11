@@ -21,9 +21,13 @@ def update_message_launch_time(sender, instance, **kwargs):
             launch_time__lte=end_time,)
 
         if conflicting_messages:
+            increment = timedelta(minutes=29)
+
             for message in conflicting_messages:
                 message.launch_time = end_time
                 message.save()
+                end_time += increment
+
         else:
             print("No messages to move ")
 
