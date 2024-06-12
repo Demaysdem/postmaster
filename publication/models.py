@@ -17,6 +17,7 @@ class TgChannel(TimeStampMixin):
 
 class Message(TimeStampMixin):
     id = models.AutoField(primary_key=True)
+    tg_message_id = models.IntegerField(null=True, blank=True)
     name = models.CharField(max_length=100, null=True, blank=True)
     launch_time = models.DateTimeField(null=True, blank=True)
     message_text = models.TextField(null=True, blank=True)
@@ -48,6 +49,10 @@ class Message(TimeStampMixin):
         self.status = status
         self.save()
 
+    def tg_message_id_item(self, tg_message_id):
+        self.tg_message_id = tg_message_id
+        self.save()
+
 
     def __str__(self):
         return str(self.name)
@@ -67,6 +72,7 @@ class Advertising(Message):
             ).exclude(id=self.id)
 
             for ad in overlapping_ads:
+                print(ad)
                 ad_end_time = ad.launch_time + timedelta(hours=ad.top_time)
                 if not (self.launch_time >= ad_end_time or self.launch_time + timedelta(
                         hours=self.top_time) <= ad.launch_time):

@@ -2,7 +2,8 @@ import requests
 import json
 import os
 
-def send_telegram_message(chat_id, message_text, method, file_path=None):
+
+def send_telegram_message(chat_id,message, message_text, method, file_path=None):
 
     token = '5463745047:AAFf0BgFRYCFIrIEsRhXWZnDTucBbI2VEPs'  # hardcoded token
 
@@ -12,7 +13,7 @@ def send_telegram_message(chat_id, message_text, method, file_path=None):
         payload = {
             "chat_id": chat_id,
             "caption": message_text,
-            "parse_mode": "MarkdownV2"
+            "parse_mode": "HTML"
         }
 
         files = {
@@ -20,7 +21,9 @@ def send_telegram_message(chat_id, message_text, method, file_path=None):
         }
         try:
             response = requests.post(url, data=payload, files=files)
-            response.raise_for_status()  # Raise an error for bad status codes
+            response.raise_for_status()
+            response_json = response.json()
+            message.tg_message_id_item(response_json['result']['message_id'])
             print("Telegram message sent successfully.")
             return True
 
@@ -52,6 +55,8 @@ def send_telegram_message(chat_id, message_text, method, file_path=None):
         try:
             response = requests.post(url, data=payload, files=files)
             response.raise_for_status()
+            response_json = response.json()
+            message.tg_message_id_item(response_json['result']['message_id'])
             print("Telegram media group sent successfully.")
             return True
 
@@ -73,12 +78,14 @@ def send_telegram_message(chat_id, message_text, method, file_path=None):
         payload = {
             "chat_id": chat_id,
             "text": message_text,
-            "parse_mode": "MarkdownV2"
+            "parse_mode": "HTML"
         }
 
         try:
             response = requests.post(url, data=payload)
             response.raise_for_status()
+            response_json = response.json()
+            message.tg_message_id_item(response_json['result']['message_id'])
             print("Telegram message sent successfully.")
             return True
 
@@ -86,3 +93,17 @@ def send_telegram_message(chat_id, message_text, method, file_path=None):
             print(f"Error sending Telegram message: {e}")
             return False
 
+def delete_message(chat_id, method, message_id):
+    token = '5463745047:AAFf0BgFRYCFIrIEsRhXWZnDTucBbI2VEPs'  # hardcoded token
+    url = f"https://api.telegram.org/bot{token}/deleteMessage"
+    params = {
+        "chat_id": chat_id,
+        "message_id": message_id
+    }
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        print(f"Message {message_id} in chat {chat_id} deleted successfully")
+        return True
+    else:
+        print(f"Failed to delete message {message_id} in chat {chat_id}")
+        return False
