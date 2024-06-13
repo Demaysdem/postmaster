@@ -1,10 +1,8 @@
-from django.db.models.signals import post_save, pre_save
-from django.db.models import Q
-from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
 
-
+from django.utils import timezone
 from django.dispatch import receiver
-from django.utils.timezone import now
+
 from datetime import timedelta
 from .models import Advertising, Message
 from .choices import MessageTypeChoices
@@ -32,14 +30,15 @@ def update_message_launch_time(sender, instance, **kwargs):
             print("No messages to move ")
 
 
-# validation to do
-# 1. If user trying to create message with launching time overlaping advertisment top time need to throw the error
-# only if both of them have same tg_channel
+# @receiver(post_save, sender=Advertising)
+# def upload_adv_to_excel(sender, instance, **kwargs):
+#     if instance.launch_time:
+#         now = timezone.now()
 #
-# 2. If user trying to create advertisment with launching time overlaping advertisment top time need to throw the error
-# only if both of them have same tg_channel
-
-
+#         start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+#         end_of_month = (start_of_month + timedelta(days=32)).replace(day=1) - timedelta(microseconds=1)
+#
+#         messages_this_month = Message.objects.filter(launch_time__gte=start_of_month, launch_time__lte=end_of_month)
 
 
 
