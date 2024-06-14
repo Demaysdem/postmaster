@@ -2,10 +2,12 @@ import requests
 import json
 import os
 
+from django.conf import settings
+
 
 def send_telegram_message(chat_id,message, message_text, method, file_path=None):
 
-    token = '5463745047:AAFf0BgFRYCFIrIEsRhXWZnDTucBbI2VEPs'  # hardcoded token
+    token = settings.TELEGRAM_TOKEN
 
     url = f'https://api.telegram.org/bot{token}/{method}'  # hardcoded URL
 
@@ -93,17 +95,19 @@ def send_telegram_message(chat_id,message, message_text, method, file_path=None)
             print(f"Error sending Telegram message: {e}")
             return False
 
+
 def delete_message(chat_id, method, message_id):
-    token = '5463745047:AAFf0BgFRYCFIrIEsRhXWZnDTucBbI2VEPs'  # hardcoded token
-    url = f"https://api.telegram.org/bot{token}/deleteMessage"
+    token = settings.TELEGRAM_TOKEN
+    url = f"https://api.telegram.org/bot{token}/{method}"
     params = {
         "chat_id": chat_id,
         "message_id": message_id
     }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
+    try:
+        response = requests.get(url, params=params)
         print(f"Message {message_id} in chat {chat_id} deleted successfully")
         return True
-    else:
-        print(f"Failed to delete message {message_id} in chat {chat_id}")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to delete message {message_id} in chat {chat_id}:{e}")
         return False
