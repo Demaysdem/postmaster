@@ -1,11 +1,9 @@
 from django.db.models.signals import post_save
-
-from django.utils import timezone
 from django.dispatch import receiver
-
 from datetime import timedelta
 from .models import Advertising, Message
 from .choices import MessageTypeChoices
+
 
 
 @receiver(post_save, sender=Advertising)
@@ -27,7 +25,7 @@ def update_message_launch_time(sender, instance, **kwargs):
                 end_time += increment
 
         else:
-            print("No messages to move ")
+            print("No messages to move")
 
 
 # @receiver(post_save, sender=Advertising)
@@ -39,7 +37,24 @@ def update_message_launch_time(sender, instance, **kwargs):
 #         end_of_month = (start_of_month + timedelta(days=32)).replace(day=1) - timedelta(microseconds=1)
 #
 #         messages_this_month = Message.objects.filter(launch_time__gte=start_of_month, launch_time__lte=end_of_month)
-
-
+#
+#         formatted_messages = "\n".join([f"{message.launch_time}" for message in messages_this_month])
+# 
+#         # Send messages to Telegram
+#         send_messages_to_telegram_bot(formatted_messages)
+#
+#
+#
+# def send_messages_to_telegram_bot(messages):
+#     token = settings.TELEGRAM_TOKEN
+#
+#     url = f"https://api.telegram.org/bot{token}/sendMessage"
+#     data = {
+#         'chat_id': "@blue_editor_bot",
+#         'text': messages
+#     }
+#     response = requests.post(url, data=data)
+#     if response.status_code != 200:
+#         raise Exception(f"Error sending message: {response.text}")
 
 

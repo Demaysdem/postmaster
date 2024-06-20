@@ -1,8 +1,5 @@
-from django.shortcuts import render
-
 from django.http import JsonResponse
 from django.views import View
-from django.conf import settings
 from .functions import send_telegram_message
 
 

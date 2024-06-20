@@ -1,7 +1,6 @@
 from django.db import models
 from .choices import MessageStatusChoices, MessageTypeChoices
 from core.models import TimeStampMixin
-from django.utils import timezone
 from django.core.exceptions import ValidationError
 from datetime import timedelta
 

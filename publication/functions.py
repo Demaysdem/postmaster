@@ -1,7 +1,6 @@
 import requests
 import json
 import os
-
 from django.conf import settings
 
 
@@ -43,7 +42,7 @@ def send_telegram_message(chat_id,message, message_text, method, file_path=None)
                 media.append({
                     'type': file_type,
                     'media': f'attach://file{i}',
-                    'caption': message_text if i == 0 else ''  # Caption only for the first media item
+                    'caption': message_text if i == 0 else ''
                 })
                 files[f'file{i}'] = open(file_path, 'rb')
             else:
